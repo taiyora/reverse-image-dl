@@ -1,3 +1,4 @@
-validators==0.12.0
-requests==2.18.4
 pyperclip==1.6.0
+validators==0.12.0
+colorama==0.3.9
+requests==2.18.4

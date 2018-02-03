@@ -1,5 +1,6 @@
 import requests
 import validators
+from colorama import init, Fore, Style
 
 def is_image_url(url):
 	# First check whether the provided string is a URL at all
@@ -12,10 +13,10 @@ def is_image_url(url):
 		response = requests.head(url)
 		response.raise_for_status()
 
-	except requests.exceptions.HTTPError        as e: print('HTTP Error: '        + str(e))
-	except requests.exceptions.ConnectionError  as e: print('Connection Error: '  + str(e))
-	except requests.exceptions.Timeout          as e: print('Timeout: '           + str(e))
-	except requests.exceptions.RequestException as e: print('Request Exception: ' + str(e))
+	except requests.exceptions.HTTPError        as e: print(Fore.RED + 'HTTP Error: '        + str(e))
+	except requests.exceptions.ConnectionError  as e: print(Fore.RED + 'Connection Error: '  + str(e))
+	except requests.exceptions.Timeout          as e: print(Fore.RED + 'Timeout: '           + str(e))
+	except requests.exceptions.RequestException as e: print(Fore.RED + 'Request Exception: ' + str(e))
 
 	else:
 		response = requests.head(url)
@@ -31,6 +32,9 @@ if __name__ == '__main__':
 	import pyperclip
 	import time
 
+	init() # Colorama
+	print(Style.BRIGHT) # Make all printed text bright (Fore.BLACK becomes grey, colours aren't dim)
+
 	last_clip = ''
 
 	# Continuously check for changes to the clipboard
@@ -40,8 +44,8 @@ if __name__ == '__main__':
 		if clip != last_clip: # Something was copied to the clipboard
 			last_clip = clip
 
-			print('Checking... ', end='')
+			print(Fore.BLACK + 'Checking... ', end='')
 			if is_image_url(clip):
-				print('Image detected!')
+				print(Fore.GREEN + 'Image detected!')
 
-		time.sleep(1) # Wait 1 second
+		time.sleep(1) # Wait 1 second to prevent unnecessary CPU usage
