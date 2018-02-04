@@ -51,10 +51,10 @@ def download_image(url, path):
 	elif len(target.split('.')[-1]) > 4: # Handles the case of a URL like "2b.jpg&..."
 		target = '.'.join(target.split('.')[:-1]) + '.' + mimetype.split('/')[-1]
 
-	# Add a number to the target filename if it already exists
+	# Add a number to the target filename if it already exists (starting at 2, same as Windows)
 	target_final = target
 
-	n = 0
+	n = 1
 	while os.path.isfile(target_final):
 		n += 1
 		target_final = '.'.join(target.split('.')[:-1]) + ' (' + str(n) + ').' + target.split('.')[1]
