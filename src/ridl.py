@@ -90,10 +90,10 @@ if __name__ == '__main__':
 			if is_image_url(clip):
 				print(Fore.GREEN + 'Image detected!')
 
-				# First download the image to the backup folder, then try to find a larger image to save
+				# First download the image to the backup folder, then try to find a larger image to save (TODO)
 				download_image(clip, image_folder_backup)
 
-				# For clarity between individual images, leave a blank line
+				# For clarity, leave a blank line after each reverse image download
 				print('')
 
 		time.sleep(1) # Wait 1 second to prevent unnecessary CPU usage
