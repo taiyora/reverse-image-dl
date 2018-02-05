@@ -94,7 +94,11 @@ def get_page_soup(url):
 	return BeautifulSoup(response.text, 'lxml')
 
 def download_best_image(url, original_image_filename):
-	"""Uses Google's reverse image search to try and find a larger version of the image at the supplied URL."""
+	"""
+	Uses Google's reverse image search to try and find a larger version of the image at the supplied URL.
+	
+	:returns: True if a valid image was found, False otherwise
+	"""
 
 	# Get the size of the original image, since we need to find only a larger one
 	original_image_path = image_folder_backup + original_image_filename
@@ -111,18 +115,18 @@ def download_best_image(url, original_image_filename):
 	results_page = get_page_soup(google_ris_url + url)
 	if not results_page:
 		print(Fore.RED + 'Failed to query Google')
-		return
+		return False
 
 	other_sizes_div = results_page.find('div', id='_w6')
 	if not other_sizes_div:
 		# This div still exists even if no similar images were found, so the parsing itself must have failed
 		print(Fore.RED + 'Failed to parse results page')
-		return
+		return False
 
 	other_sizes_links = other_sizes_div.find_all('a')
 	if not len(other_sizes_links):
 		print(Fore.YELLOW + "Google couldn't find any matching images")
-		return
+		return False
 
 	largest_found_size_url = other_sizes_links[-1].get('href') # Will link to the Large, Medium, or Small images page
 	print(Fore.BLACK + 'Checking ' + other_sizes_links[-1].string + ' images... ', end='')
@@ -130,13 +134,13 @@ def download_best_image(url, original_image_filename):
 	images_page = get_page_soup(google_url + largest_found_size_url)
 	if not images_page:
 		print(Fore.RED + 'Failed to query Google')
-		return
+		return False
 	
 	# Form a list of the found images. We will get all the data Google provides for each image
 	images = images_page.find_all(class_='rg_meta')
 	if not images:
 		print(Fore.RED + 'Failed to parse images page')
-		return
+		return False
 
 	for image in images:
 		# We can convert the image data to JSON, which will contain the image's width, height, and true URL
@@ -155,14 +159,24 @@ def download_best_image(url, original_image_filename):
 			print(Fore.GREEN + 'Successfully found larger image: ' + Fore.MAGENTA + str(width) + 'x' + str(height))
 			download_image(image_url, image_folder)
 
+			return True
+
 		else:
 			print(Fore.YELLOW + "Google couldn't find any larger images")
-
-		return
+			return False
 
 if __name__ == '__main__':
+	import argparse
 	import pyperclip
 	import time
+
+	# Check command-line arguments
+	parser = argparse.ArgumentParser()
+	
+	parser.add_argument('-s', '--single_folder', action='store_true',
+		help="If a larger image isn't found, move the original image to the main image folder.")
+
+	args = parser.parse_args()
 
 	init() # Colorama
 	print(Style.BRIGHT) # Make all printed text bright (Fore.BLACK becomes grey, colours aren't dim)
@@ -182,7 +196,15 @@ if __name__ == '__main__':
 
 				# First download the image to the backup folder, then try to find a larger image to save
 				original_image_filename = download_image(clip, image_folder_backup)
-				download_best_image(clip, original_image_filename)
+				found_image = download_best_image(clip, original_image_filename)
+
+				# If the "single folder" option is enabled and a larger image wasn't found, move the original image to the main folder
+				if args.single_folder and not found_image:
+					src = image_folder_backup + original_image_filename
+					dest = image_folder + original_image_filename
+
+					os.rename(src, dest)
+					print(Fore.BLACK + 'Moved ' + src + ' to ' + dest)
 
 				# For clarity, leave a blank line after each reverse image download
 				print('')
