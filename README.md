@@ -1,7 +1,7 @@
 # reverse-image-dl (RIDL)
 RIDL (pronounced "riddle") is a small script that monitors the clipboard and, upon detecting an image URL, uses Google's reverse image search capabilities to find the largest possible version of that image.
 
-![RIDL](https://github.com/taiyora/reverse-image-dl/blob/master/screenshots/2018-02-05%20Light.png)
+![RIDL](screenshots/2018-02-05%20Light.png)
 
 Planned features include:
  * Ability to detect and upload image files in addition to URLs.
